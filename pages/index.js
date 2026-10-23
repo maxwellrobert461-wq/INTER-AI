@@ -1,3 +1,6 @@
+<link rel="manifest" href="/manifest.json" />
+<meta name="theme-color" content="#000000" />
+<link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/4712/4712109.png" />
 import { useState, useRef, useEffect } from 'react'
 import Head from 'next/head'
 
