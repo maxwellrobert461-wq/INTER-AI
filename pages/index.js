@@ -1,118 +1,123 @@
 import { useState, useRef, useEffect } from 'react'
 
-export default function Home() {
+export default function MetaClone() {
   const [input, setInput] = useState('')
-  const [messages, setMessages] = useState([
-    { role: 'assistant', content: '👑 INTER AI APP STUDIO\n\nI can BUILD APPS for you like Meta!\n\nTry:\n• "Create a calculator app"\n• "Build a todo app"\n• "Make a shop website"\n• "Create a chat app"\n\nWhat app should I build?' }
-  ])
+  const [messages, setMessages] = useState([])
   const [loading, setLoading] = useState(false)
-  const [showMenu, setShowMenu] = useState(false)
-  const [appCode, setAppCode] = useState('')
-  const [showPreview, setShowPreview] = useState(false)
+  const [sidebar, setSidebar] = useState(true)
+  const [chats, setChats] = useState([{ id: 1, title: 'New chat', time: 'Now' }])
+  const [activeId, setActiveId] = useState(1)
   const chatRef = useRef(null)
 
   useEffect(() => { chatRef.current?.scrollTo(0, chatRef.current.scrollHeight) }, [messages])
 
-  async function send() {
-    if (!input.trim() || loading) return
-    const userMsg = { role: 'user', content: input }
-    const isAppRequest = input.toLowerCase().includes('create') || input.toLowerCase().includes('build') || input.toLowerCase().includes('make') || input.toLowerCase().includes('app')
-    setMessages(p => [...p, userMsg])
+  async function send(t = input) {
+    if (!t.trim() || loading) return
+    const userMsg = { role: 'user', content: t }
+    setMessages(m => [...m, userMsg])
     setInput('')
     setLoading(true)
     try {
+      const saved = JSON.parse(localStorage.getItem('inter_keys') || '{}')
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          message: isAppRequest 
-            ? `You are INTER AI App Builder. User wants: "${userMsg.content}". Create a complete single-file HTML app with inline CSS and JS. Must be fully functional, modern, mobile-responsive, Meta-style beautiful. Return ONLY HTML code starting with <!DOCTYPE html>. No explanation, just code.` 
-            : userMsg.content,
-          mode: isAppRequest ? 'app' : 'chat'
-        })
+        body: JSON.stringify({ message: t, groqKey: saved.groq || '' })
       })
       const data = await res.json()
-      const reply = data.reply || 'Error'
-      
-      if (reply.includes('<!DOCTYPE') || reply.includes('<html')) {
-        setAppCode(reply)
-        setMessages(p => [...p, { role: 'assistant', content: `✅ APP BUILT! Your app is ready!\n\n${userMsg.content}\n\nClick PREVIEW to see it or DOWNLOAD to get file.`, hasApp: true, code: reply }])
-      } else {
-        setMessages(p => [...p, { role: 'assistant', content: reply }])
-      }
-    } catch {
-      setMessages(p => [...p, { role: 'assistant', content: '⚠️ Add GROQ_API_KEY in Vercel Settings to build apps!' }])
-    }
+      setMessages(m => [...m, { role: 'assistant', content: data.reply }])
+    } catch { setMessages(m => [...m, { role: 'assistant', content: 'Error — Add GROQ_API_KEY in /settings' }]) }
     setLoading(false)
   }
 
-  function downloadApp(code, name='inter-app.html') {
-    const blob = new Blob([code], { type: 'text/html' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url; a.download = name; a.click()
-  }
+  const suggestions = [
+    { icon: '💡', title: 'Create an image', desc: 'of a futuristic city' },
+    { icon: '📝', title: 'Write a story', desc: 'about space adventure' },
+    { icon: '💻', title: 'Create an app', desc: 'like calculator or todo' },
+    { icon: '🎨', title: 'Help me brainstorm', desc: 'business ideas' },
+  ]
 
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: '#f0f2f5', fontFamily: 'sans-serif' }}>
-      {/* HEADER */}
-      <div style={{ background: '#fff', borderBottom: '1px solid #dddfe2', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, #0064e0, #a033ff, #ff3d5a)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 'bold' }}>M</div>
-        <div><div style={{ fontWeight: 700 }}>INTER AI <span style={{ color: '#0064e0' }}>APP STUDIO</span></div><div style={{ fontSize: '11px', color: '#65676b' }}>● Build Apps Like Meta</div></div>
-        <div style={{ marginLeft: 'auto', position: 'relative' }}>
-          <button onClick={() => setShowMenu(!showMenu)} style={{ width: '36px', height: '36px', borderRadius: '50%', border: 'none', background: '#f0f2f5', cursor: 'pointer' }}>⋯</button>
-          {showMenu && (
-            <div style={{ position: 'absolute', right: 0, top: '45px', background: '#fff', borderRadius: '12px', boxShadow: '0 8px 24px rgba(0,0,0,0.15)', width: '200px', zIndex: 100 }}>
-              <div onClick={() => { setMessages([{ role: 'assistant', content: '✨ New session — What app to build?' }]); setAppCode(''); setShowMenu(false) }} style={{ padding: '12px', cursor: 'pointer' }}>🗑️ New Build</div>
-              <div onClick={() => { if(appCode) downloadApp(appCode); setShowMenu(false) }} style={{ padding: '12px', cursor: 'pointer' }}>💾 Download Last App</div>
-              <div onClick={() => setShowMenu(false)} style={{ padding: '12px', cursor: 'pointer' }}>ℹ️ How to use: Type "Create..."</div>
+    <div style={{ height: '100vh', display: 'flex', fontFamily: 'Inter, sans-serif', background: '#fbfb', color: '#111' }}>
+      {/* SIDEBAR - EXACT META.AI */}
+      <div style={{ width: sidebar ? '280px' : '0', background: '#f5f5f5', borderRight: '1px solid #e5e5e5', display: 'flex', flexDirection: 'column', overflow: 'hidden', transition: '0.2s' }}>
+        <div style={{ padding: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 800, fontSize: '22px' }}><span style={{ background: 'linear-gradient(90deg,#0064e0,#8b5cf6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>∞</span> Meta AI</div>
+          <button onClick={() => { setMessages([]); setActiveId(Date.now()) }} style={{ width: '100%', marginTop: '20px', background: '#fff', border: '1px solid #ddd', borderRadius: '24px', padding: '12px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}>✎ New chat</button>
+          <button onClick={() => window.location.href='/settings'} style={{ width: '100%', marginTop: '10px', background: '#111', color: '#fff', border: 'none', borderRadius: '24px', padding: '10px', cursor: 'pointer' }}>🔑 API Keys Vault</button>
+        </div>
+        <div style={{ padding: '12px 16px', flex: 1, overflowY: 'auto' }}>
+          <div style={{ fontSize: '12px', fontWeight: 600, color: '#888', marginBottom: '10px' }}>Recent</div>
+          {chats.map(c => (
+            <div key={c.id} onClick={() => setActiveId(c.id)} style={{ padding: '10px 12px', borderRadius: '10px', background: activeId===c.id ? '#fff' : 'transparent', cursor: 'pointer', fontSize: '14px', border: activeId===c.id ? '1px solid #e5e5e5' : '1px solid transparent', marginBottom: '4px' }}>{c.title}</div>
+          ))}
+          <div style={{ marginTop: '24px', fontSize: '12px', color: '#888' }}>
+            <div style={{ padding: '8px 0' }}>⚙️ Settings</div>
+            <div style={{ padding: '8px 0' }}>💬 Help</div>
+            <div style={{ padding: '8px 0', fontWeight: 600 }}>INTER AI PLATFORM v1.0<br/>Built like Meta AI</div>
+          </div>
+        </div>
+      </div>
+
+      {/* MAIN - EXACT META.AI */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: '#fff' }}>
+        <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '12px', borderBottom: '1px solid #f0f0f0' }}>
+          <button onClick={() => setSidebar(!sidebar)} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer' }}>☰</button>
+          <div style={{ fontWeight: 600 }}>Meta AI • INTER AI</div>
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg,#0064e0,#a855f7)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '14px' }}>U</div>
+          </div>
+        </div>
+
+        <div ref={chatRef} style={{ flex: 1, overflowY: 'auto' }}>
+          {messages.length===0 ? (
+            <div style={{ maxWidth: '700px', margin: '0 auto', padding: '40px 20px' }}>
+              <h1 style={{ fontSize: '32px', fontWeight: 700, textAlign: 'center', marginBottom: '8px' }}>What's on your mind?</h1>
+              <p style={{ textAlign: 'center', color: '#666', marginBottom: '30px' }}>Ask anything — Create apps, images, code, like Meta AI</p>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '30px' }}>
+                {suggestions.map((s,i) => (
+                  <button key={i} onClick={() => send(s.title + ' ' + s.desc)} style={{ textAlign: 'left', background: '#f9f9f9', border: '1px solid #eee', borderRadius: '16px', padding: '16px', cursor: 'pointer' }}>
+                    <div style={{ fontSize: '20px' }}>{s.icon}</div>
+                    <div style={{ fontWeight: 600, fontSize: '14px', marginTop: '8px' }}>{s.title}</div>
+                    <div style={{ fontSize: '12px', color: '#666' }}>{s.desc}</div>
+                  </button>
+                ))}
+              </div>
+
+              <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                {['Create a calculator app','Build a todo list','Make a portfolio site','Weather app'].map(t => (
+                  <button key={t} onClick={() => send(t)} style={{ background: '#f0f0f0', border: 'none', borderRadius: '20px', padding: '8px 14px', fontSize: '13px', cursor: 'pointer' }}>{t}</button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div style={{ maxWidth: '700px', margin: '0 auto', padding: '20px' }}>
+              {messages.map((m,i) => (
+                <div key={i} style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: m.role==='user' ? '#000' : 'linear-gradient(135deg,#0064e0,#a855f7)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '12px', fontWeight: 700 }}>{m.role==='user' ? 'U' : '∞'}</div>
+                  <div style={{ flex: 1, paddingTop: '4px', whiteSpace: 'pre-wrap', lineHeight: 1.6, fontSize: '15px' }}>{m.content}</div>
+                </div>
+              ))}
+              {loading && <div style={{ display: 'flex', gap: '12px' }}><div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg,#0064e0,#a855f7)' }}></div><div style={{ color: '#888' }}>Meta AI is thinking...</div></div>}
             </div>
           )}
         </div>
-      </div>
 
-      {/* CHAT */}
-      <div ref={chatRef} style={{ flex: 1, overflowY: 'auto', padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }} onClick={() => setShowMenu(false)}>
-        {messages.map((m, i) => (
-          <div key={i} style={{ alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start', maxWidth: '85%' }}>
-            <div style={{ background: m.role === 'user' ? '#0084ff' : '#fff', color: m.role === 'user' ? '#fff' : '#000', padding: '12px 14px', borderRadius: m.role === 'user' ? '18px 18px 4px 18px' : '12px', boxShadow: '0 1px 2px rgba(0,0,0,0.1)', whiteSpace: 'pre-wrap', fontSize: '14px' }}>{m.content}</div>
-            {m.hasApp && (
-              <div style={{ marginTop: '8px', display: 'flex', gap: '8px' }}>
-                <button onClick={() => setShowPreview(true)} style={{ background: '#000', color: '#fff', border: 'none', padding: '8px 14px', borderRadius: '20px', cursor: 'pointer', fontSize: '12px' }}>👁️ PREVIEW APP</button>
-                <button onClick={() => downloadApp(m.code, 'inter-app.html')} style={{ background: '#0084ff', color: '#fff', border: 'none', padding: '8px 14px', borderRadius: '20px', cursor: 'pointer', fontSize: '12px' }}>💾 DOWNLOAD</button>
+        {/* INPUT - EXACT META.AI */}
+        <div style={{ padding: '16px', background: '#fff' }}>
+          <div style={{ maxWidth: '700px', margin: '0 auto' }}>
+            <div style={{ background: '#f3f3f3', borderRadius: '28px', padding: '8px 8px 8px 20px', display: 'flex', alignItems: 'flex-end', gap: '8px', border: '1px solid #e5e5e5' }}>
+              <textarea value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); send() }}} placeholder="Ask Meta AI anything..." rows={1} style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', resize: 'none', fontSize: '15px', maxHeight: '120px', padding: '10px 0' }} />
+              <div style={{ display: 'flex', gap: '6px', alignItems: 'center', paddingBottom: '4px' }}>
+                <button style={{ width: '32px', height: '32px', borderRadius: '50%', border: 'none', background: '#fff', cursor: 'pointer' }}>🎤</button>
+                <button onClick={() => send()} style={{ width: '36px', height: '36px', borderRadius: '50%', border: 'none', background: input ? '#000' : '#ddd', color: '#fff', cursor: 'pointer' }}>↑</button>
               </div>
-            )}
-          </div>
-        ))}
-        {loading && <div style={{ background: '#fff', padding: '10px', borderRadius: '12px', width: 'fit-content' }}>⚡ Building your app...</div>}
-      </div>
-
-      {/* QUICK APP BUTTONS */}
-      <div style={{ background: '#fff', padding: '8px 12px', display: 'flex', gap: '8px', overflowX: 'auto', borderTop: '1px solid #eee' }}>
-        {['Calculator App','Todo App','Shop Website','Weather App'].map(t => (
-          <button key={t} onClick={() => setInput(`Create a ${t}`)} style={{ whiteSpace: 'nowrap', background: '#f0f2f5', border: '1px solid #ddd', padding: '6px 12px', borderRadius: '20px', fontSize: '12px', cursor: 'pointer' }}>{t}</button>
-        ))}
-      </div>
-
-      {/* INPUT */}
-      <div style={{ background: '#fff', padding: '10px 12px', display: 'flex', gap: '8px', borderTop: '1px solid #dddfe2' }}>
-        <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && send()} placeholder='Type "Create a..." to build app' style={{ flex: 1, background: '#f0f2f5', border: 'none', borderRadius: '20px', padding: '12px 16px', outline: 'none' }} />
-        <button onClick={send} style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#0084ff', border: 'none', color: '#fff', cursor: 'pointer' }}>➤</button>
-      </div>
-
-      {/* APP PREVIEW MODAL */}
-      {showPreview && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', flexDirection: 'column' }}>
-          <div style={{ background: '#fff', padding: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <b>📱 Your App Preview</b>
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <button onClick={() => downloadApp(appCode)} style={{ background: '#0084ff', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '8px' }}>Download</button>
-              <button onClick={() => setShowPreview(false)} style={{ background: '#000', color: '#fff', border: 'none', padding: '6px 12px', borderRadius: '8px' }}>✕ Close</button>
             </div>
+            <div style={{ textAlign: 'center', fontSize: '11px', color: '#999', marginTop: '10px' }}>INTER AI can make mistakes. Check important info. Built like Meta AI • API Keys in Settings</div>
           </div>
-          <iframe srcDoc={appCode} style={{ flex: 1, border: 'none', background: '#fff' }} title="App Preview" />
         </div>
-      )}
+      </div>
     </div>
   )
 }
