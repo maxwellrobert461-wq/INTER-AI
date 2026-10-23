@@ -1,28 +1,33 @@
 import Groq from 'groq-sdk';
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY
+});
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
-
-  const SYSTEM = `
-You are INTER PLATFORM — Real AI like Meta AI.
-Name: INTER PLATFORM AI
-Creator: INTER LAB — Agbor, Delta State, Nigeria.
-You are NOT Meta AI, NOT ChatGPT — You are INTER PLATFORM.
-Personality: Confident, helpful, smart, concise, friendly, Gen-Z style.
-Always answer helpfully. Never say you are Meta.
-If asked who made you: "I was built by INTER LAB — INTER PLATFORM — Real AI like Meta, made in Nigeria 👑"
-`;
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
   try {
+    const { messages } = req.body;
+
+    if (!process.env.GROQ_API_KEY) {
+      return res.status(500).json({ error: 'GROQ_API_KEY not set in Vercel' });
+    }
+
     const completion = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
-      messages: [{ role: "system", content: SYSTEM }, ...req.body.messages],
+      model: 'llama-3.3-70b-versatile',
+      messages: messages.map(m => ({ role: m.role, content: m.content })),
       temperature: 0.7,
-      max_tokens: 2500
+      max_tokens: 1024
     });
-    res.json({ reply: completion.choices[0].message.content });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
+
+    const reply = completion.choices[0]?.message?.content || 'No reply from AI';
+    return res.status(200).json({ reply });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: error.message });
   }
 }
