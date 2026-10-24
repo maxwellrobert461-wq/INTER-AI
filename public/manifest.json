@@ -1,1 +1,1 @@
-{"name":"INTER AI","short_name":"INTER AI","start_url":"/","display":"standalone","background_color":"#ffffff","theme_color":"#000000","icons":[{"src":"/icon.png","sizes":"512x512","type":"image/png"}]}
+{ "name": "INTER AI - Build apps with AI", "short_name": "INTER AI", "start_url": "/", "display": "standalone", "background_color": "#ffffff", "theme_color": "#000000", "description": "Build apps, websites with AI, auto-install, host with domain. ₦20k with domain, ₦10k own domain", "icons": [{ "src": "/icon.png", "sizes": "512x512", "type": "image/png" }] }
