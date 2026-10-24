@@ -1,16 +1,15 @@
 {
   "name": "inter-ai",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
-  },
+  "scripts": { "dev": "next dev", "build": "next build", "start": "next start" },
   "dependencies": {
     "next": "14.2.5",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
-    "groq-sdk": "^0.7.0"
+    "react": "^18",
+    "react-dom": "^18",
+    "@mastra/core": "^0.1.7",
+    "@ai-sdk/groq": "^1.0.0",
+    "ai": "^4.3.0",
+    "zod": "^3.23.8"
   }
-} 
+}
