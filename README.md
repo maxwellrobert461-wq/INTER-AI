@@ -1,22 +1,12 @@
-# INTER PLATFORM 👑 — Real AI like Meta AI
+# INTER AI
+INTER AI builds apps, websites, POS, portfolios with AI using Mastra + Groq.
 
-> **The Nigerian Meta AI — Real AI Platform Built in Nigeria by INTER LAB**
+What INTER AI does:
+- INTER AI app builder
+- INTER AI website builder  
+- INTER AI auto-install PWA
+- INTER AI domain check & buy
+- INTER AI hosting
+- INTER AI billing ₦20k with domain / ₦10k own domain
 
-![INTER PLATFORM](https://cdn-icons-png.flaticon.com/512/4712/4712109.png)
-
-### 🔥 What is INTER PLATFORM?
-
-**INTER PLATFORM is not an app builder — It's a real AI platform like Meta AI, ChatGPT, and Groq — Built in Nigeria.**
-
-While Meta AI is American and ChatGPT is American, INTER PLATFORM is African — Made in Agbor, Delta State, Nigeria by INTER LAB.
-
-### ⚡ Features — Like Meta AI
-
-- **💬 Real AI Chat:** Ask anything — school, code, business, life, love — Get instant smart replies
-- **🧠 Brain:** Powered by Groq Llama 3.3 70B — Same Llama model that powers Meta AI
-- **🚀 Fast & Light:** Works on any phone, even with low data — No lag
-- **📱 Installable:** Add to home screen like real app — No Play Store needed (PWA)
-- **🇳🇬 Built in Nigeria:** Understands Nigerian context, Pidgin, school system, business
-- **💰 Monetized like Meta:** Free 10 chats/day + PRO ₦2000/month + In-chat ads
-
-### 🧬
+Powered by Mastra Agents, Workflows, Memory, Guardrails, MCP.
