@@ -1,17 +1,1 @@
-{
-  "name": "INTER AI by Oderah Chidalu Vitalis Vitalis",
-  "short_name": "INTER AI",
-  "description": "INTER AI - AI platform like Meta AI created by Oderah Chidalu Vitalis Vitalis",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#000000",
-  "icons": [
-    {
-      "src": "https://cdn-icons-png.flaticon.com/512/4712/4712109.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ]
-}
+{"name":"INTER AI","short_name":"INTER AI","start_url":"/","display":"standalone","background_color":"#ffffff","theme_color":"#000000","icons":[{"src":"/icon.png","sizes":"512x512","type":"image/png"}]}
